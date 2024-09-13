@@ -1,7 +1,7 @@
 const {User} = require("./../models/User")
 const bcrypt = require('bcrypt')
 const express = require("express")
-
+const jwt = require("jsonwebtoken")
 
 
 async function signUp(req,res){
@@ -49,7 +49,7 @@ async function logIn(req,res){
     
     res.send({
         userId: userInDb._id,
-        token:"token"
+        token:generateToken(userInDb._id)
     })
 }
 
@@ -67,6 +67,16 @@ function isPassWordCorrect(password, hash) {
    return isOkay
 }
 
+function generateToken(idInDb){
+    const payload ={
+        userId : idInDb
+    }
+    const jwtSecret = String(process.env.JWT_SECRET)
+    const token = jwt.sign(payload, jwtSecret,{
+        expiresIn:"1d"
+    });
+    return token
+}
 
 const userRouter = express.Router()
 
